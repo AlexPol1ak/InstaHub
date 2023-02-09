@@ -13,7 +13,10 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), #post
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'), #post
     path('my-data/', RetrieveSelfUserAPIView.as_view(), name='my_data'), #get
-    # path('user-data/<int:pk>/', RetrieveUserAPIView.as_view(), name='user-data' )
+    path('user-data/<int:pk>/', RetrieveUserAPIView.as_view(), name='user-data'), #get
+    path('update-user/<int:pk>/', UdpadeUserDataAPIView.as_view(), name='update-user'), #put, patch
+    path('update-password/<int:pk>/', UpdatePasswordAPIView.as_view(), name='update_password'), #put, patch
+
 
 
 

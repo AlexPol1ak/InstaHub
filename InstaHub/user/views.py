@@ -8,10 +8,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from user import utils, service
 from user.models import User
 from user.permissions import IsAdminOrOwner
 from user.serializers import UserSerializer, RetrieveUserSerializer, UserUpdateDataSerializer, \
-    UserUpdatePasswordSerializer
+    UserUpdatePasswordSerializer, ResetPasswordSerializer
+
 
 
 @api_view(['GET'])
@@ -76,12 +78,44 @@ class UpdatePasswordAPIView(UpdateAPIView):
     serializer_class = UserUpdatePasswordSerializer
     permission_classes = (IsAuthenticated, IsAdminOrOwner)
 
+    # Запрещает передачу в запросе неполных данных. Например, новый пароль без указания старого.
     def patch(self, request, *args, **kwargs):
-        # Запрещает передачу в запросе неполных данных. Например, новый пароль без указания старого.
         return self.put(request, *args, **kwargs)
 
-class ResetPasswordAPIView():
-    pass
+class ResetPasswordAPIView(APIView):
+
+    permission_classes = (AllowAny,)
+
+    @extend_schema(responses=ResetPasswordSerializer)
+    def post(self, request):
+        """Запрос для сброса пароля."""
+
+        serializer_data = ResetPasswordSerializer(data=request.data)
+        if serializer_data.is_valid(raise_exception=True):
+            try:
+                user = User.objects.get(login=serializer_data.validated_data['login'])
+            except Exception as e:
+                return Response({'Error': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if user.email == serializer_data.validated_data.get('email', None):
+                try:
+                    password :str = utils.PasswordGeneration.get_random_password(10)
+
+                    user_message  = service.MessagesSender(user=user)
+                    res :str = user_message.send_email_reset_password(password=password)
+                except Exception as e:
+                    return Response({'Error': e.__repr__()})
+                else:
+                    user.set_password(password)
+                    user.save()
+                    return Response(res, status=status.HTTP_202_ACCEPTED)
+
+            else:
+                return Response({'Error': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer_data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class GetAllUserAPIView():
     pass

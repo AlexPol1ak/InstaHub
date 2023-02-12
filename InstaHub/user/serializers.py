@@ -69,3 +69,11 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
         instance.set_password(validated_data['new_password'])
         instance.save()
         return instance
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    """Сериализатор для сброса пароля"""
+
+    login = serializers.CharField(max_length=40, required=True, write_only=True)
+    email = serializers.EmailField(max_length=40, required=True, write_only=True)
+    response = serializers.CharField(read_only=True)

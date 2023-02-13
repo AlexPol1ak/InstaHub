@@ -3,7 +3,7 @@ from django.shortcuts import render
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import RetrieveAPIView, get_object_or_404, UpdateAPIView, ListAPIView
+from rest_framework.generics import RetrieveAPIView, get_object_or_404, UpdateAPIView, ListAPIView, DestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,9 +11,9 @@ from rest_framework.views import APIView
 from user import utils, service
 from user.models import User
 from user.paginators import GatAllUsersPagination
-from user.permissions import IsAdminOrOwner
+from user.permissions import IsAdminOrOwnerPermission, IsOwnerPermission
 from user.serializers import UserSerializer, RetrieveUserSerializer, UserUpdateDataSerializer, \
-    UserUpdatePasswordSerializer, ResetPasswordSerializer, GetAllUserSerializer
+    UserUpdatePasswordSerializer, ResetPasswordSerializer, GetAllUserSerializer, DestroyOrDeactivateSerializer
 
 
 @api_view(['GET'])
@@ -61,7 +61,7 @@ class RetrieveUserAPIView(RetrieveAPIView):
 
     queryset = User
     serializer_class = RetrieveUserSerializer
-    permission_classes = (IsAuthenticated, IsAdminOrOwner)
+    permission_classes = (IsAuthenticated, IsAdminOrOwnerPermission)
 
 
 class UdpadeUserDataAPIView(UpdateAPIView):
@@ -69,14 +69,14 @@ class UdpadeUserDataAPIView(UpdateAPIView):
 
     queryset = User
     serializer_class = UserUpdateDataSerializer
-    permission_classes = (IsAuthenticated, IsAdminOrOwner)
+    permission_classes = (IsAuthenticated, IsAdminOrOwnerPermission)
 
 
 class UpdatePasswordAPIView(UpdateAPIView):
     """Изменяет пароль пользователя."""
     queryset = User
     serializer_class = UserUpdatePasswordSerializer
-    permission_classes = (IsAuthenticated, IsAdminOrOwner)
+    permission_classes = (IsAuthenticated, IsAdminOrOwnerPermission)
 
     # Запрещает передачу в запросе неполных данных. Например, новый пароль без указания старого.
     def patch(self, request, *args, **kwargs):
@@ -130,10 +130,53 @@ class GetAllUsersAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, IsAdminUser )
 
 
+class DestroySelfAPIView(DestroyAPIView):
+    """Удаление аккаунта пользователем."""
+    queryset = User
+    serializer_class = DestroyOrDeactivateSerializer
+    pagination_class = (IsAuthenticated, IsOwnerPermission)
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, pk=self.request.user.pk)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    def destroy(self, request, *args, **kwargs):
+
+        serializer_data = self.serializer_class(data=request.data)
+        serializer_data.is_valid()
+        password = serializer_data.validated_data.get('password', None)
+
+        if not password:
+            return Response({"PasswordError": "Enter your password"}, status=status.HTTP_409_CONFLICT)
+        elif request.user.check_password(password):
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"PasswordError": "Wrong password"}, status=status.HTTP_423_LOCKED)
 
 
-class DeactivateUserAPIView():
-    pass
+class DeactivateSelfAPIView(DestroySelfAPIView):
+    """Деактивация аккаунта пользователем."""
+    def perform_destroy(self, instance):
+        instance.is_activ = False
+        instance.save()
+
+
+class DestroyUserAPIView(DestroyAPIView):
+    """Удаление аккаунта пользователя администратором"""
+    queryset = User
+    pagination_class = (IsAuthenticated, IsAdminUser)
+
+
+class DeactivateUserAPIView(DestroyUserAPIView):
+    """Деактивация аккаунта пользователя администратором"""
+    def perform_destroy(self, instance):
+        instance.is_activ = False
+        instance.save()
+
 
 class AddAccountInstagramAPIView(): # Реализовать шифрование
     pass

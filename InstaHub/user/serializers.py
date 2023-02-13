@@ -79,6 +79,22 @@ class ResetPasswordSerializer(serializers.Serializer):
     response = serializers.CharField(read_only=True)
 
 class GetAllUserSerializer(serializers.ModelSerializer):
+    """Сериализатор для отображения всех пользователей"""
     class Meta:
         model = User
         fields = ('id', 'login', 'email', 'phone_number', 'date_joined')
+
+
+class DestroyOrDeactivateSerializer(serializers.Serializer):
+    """
+    Сериализатор для деактивации или удаления пользователя.
+    Сериализует введенный пароль для выполнения действия.
+    """
+    password = serializers.CharField(write_only=True, required=True)
+
+    # class Meta:
+    #     fields = ('password',)
+
+
+
+

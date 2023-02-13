@@ -77,3 +77,8 @@ class ResetPasswordSerializer(serializers.Serializer):
     login = serializers.CharField(max_length=40, required=True, write_only=True)
     email = serializers.EmailField(max_length=40, required=True, write_only=True)
     response = serializers.CharField(read_only=True)
+
+class GetAllUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'login', 'email', 'phone_number', 'date_joined')

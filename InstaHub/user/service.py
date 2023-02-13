@@ -5,8 +5,8 @@ from InstaHub.settings import EMAIL_HOST_USER
 from user.models import User
 
 
-class  MessagesSender():
-    """Содержит функционал для отправки сообщений."""
+class MessagesSender():
+    """Содержит функционал для отправки сообщений пользователю."""
 
     def __init__(self, user: User):
         """Инициализация пользователя."""

@@ -17,6 +17,7 @@ urlpatterns = [
     path('update-user/<int:pk>/', UdpadeUserDataAPIView.as_view(), name='update-user'), #put, patch
     path('update-password/<int:pk>/', UpdatePasswordAPIView.as_view(), name='update_password'), #put, patch
     path('reset-password/', ResetPasswordAPIView.as_view(), name='reset_password'), #post
+    path('get-all-users/', GetAllUsersAPIView.as_view(), name='get_all_users'), #get
 
 
 

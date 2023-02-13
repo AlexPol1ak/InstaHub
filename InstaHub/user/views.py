@@ -3,17 +3,17 @@ from django.shortcuts import render
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import RetrieveAPIView, get_object_or_404, UpdateAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.generics import RetrieveAPIView, get_object_or_404, UpdateAPIView, ListAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from user import utils, service
 from user.models import User
+from user.paginators import GatAllUsersPagination
 from user.permissions import IsAdminOrOwner
 from user.serializers import UserSerializer, RetrieveUserSerializer, UserUpdateDataSerializer, \
-    UserUpdatePasswordSerializer, ResetPasswordSerializer
-
+    UserUpdatePasswordSerializer, ResetPasswordSerializer, GetAllUserSerializer
 
 
 @api_view(['GET'])
@@ -83,6 +83,11 @@ class UpdatePasswordAPIView(UpdateAPIView):
         return self.put(request, *args, **kwargs)
 
 class ResetPasswordAPIView(APIView):
+    """
+    Сбрасывает пароль пользователя при предоставлении логина и email.
+    Если логин и email совпадает с аккаунтом определенного пользователя, то текущий пароль сбрасывается,
+    генерируется и устанавливается случайный пароль,котрый отправляется на email.
+    """
 
     permission_classes = (AllowAny,)
 
@@ -101,7 +106,7 @@ class ResetPasswordAPIView(APIView):
                 try:
                     password :str = utils.PasswordGeneration.get_random_password(10)
 
-                    user_message  = service.MessagesSender(user=user)
+                    user_message = service.MessagesSender(user=user)
                     res :str = user_message.send_email_reset_password(password=password)
                 except Exception as e:
                     return Response({'Error': e.__repr__()})
@@ -117,8 +122,15 @@ class ResetPasswordAPIView(APIView):
 
 
 
-class GetAllUserAPIView():
-    pass
+class GetAllUsersAPIView(ListAPIView):
+    """Предоставляет список все пользователей"""
+    queryset = User.objects.all()
+    serializer_class = GetAllUserSerializer
+    pagination_class = GatAllUsersPagination
+    permission_classes = (IsAuthenticated, IsAdminUser )
+
+
+
 
 class DeactivateUserAPIView():
     pass

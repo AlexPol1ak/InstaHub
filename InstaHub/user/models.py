@@ -7,7 +7,7 @@ from django.utils import timezone
 from user.managers import UserManager
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """Модель учетных данных пользователя."""
+    """Модель для личных данных пользователя."""
 
     login = models.CharField(max_length=40, unique=True, verbose_name='Логин')
     first_name = models.CharField(max_length=40, blank=True, verbose_name='Имя')
@@ -38,11 +38,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         return user
 
 
+
+
 class User_instagram_account(models.Model):
-    """Модель хранит учетные данные от instagram пользвателей."""
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    login = models.CharField(max_length=40, unique=True, blank=True, verbose_name='Instagram пользователя')
-    password = models.CharField(max_length=40, blank=True, verbose_name='Пароль пользователя')
+    """Модель хранит данные пользователей для авторизации в instagram ."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, parent_link=True)
+    login_inst = models.CharField(max_length=40, unique=True, blank=True, verbose_name='Instagram пользователя')
+    password_inst = models.CharField(max_length=40, blank=True, verbose_name='Пароль пользователя')
 
     class Meta:
         verbose_name = 'Instagram акаунт пользователя'

@@ -181,34 +181,27 @@ class DeactivateUserAPIView(DestroyUserAPIView):
 
 
 class UserInstagramAccountViewSet(viewsets.ModelViewSet):
-    """Сохраняет, изменяет, удаляет, представляет для чтения пользовательские учетные данные для instagram"""
+    """Сохраняет, изменяет, удаляет, представляет для чтения пользовательские данные авторизации в instagram"""
 
     queryset = User_instagram_account.objects.all()
     serializer_class = UserInstagramAccountSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,) # Доделать разрешения
 
     def get_object(self):
-        queryset = self.get_queryset()
+        queryset = self.filter_queryset(self.get_queryset())
         obj = get_object_or_404(queryset, user_id=self.request.user.pk)
         self.check_object_permissions(self.request, obj)
         return obj
-    @action(detail=False, methods=['patch', 'put'], url_name='change', url_path='change')
-    def change_inst_data(self,request, pk=None):
+
+    @action(detail=False, methods=['patch', 'put'], url_name='change', url_path='change',)
+    def change_inst_data(self,request,pk=None):
+        """Изменяет пользовательские данные авторизации в instagram"""
         return super().partial_update(request, pk)
 
     @action(detail=False, methods=['delete'], url_name='delete', url_path='delete')
     def delete_inst_data(self,request, pk=None):
+        """Удаляет пользовательские данные авторизации в instagram"""
         return super().destroy(request, pk)
 
+    # Добавить апи администратора
 
-
-#Доделать виев сет  на изменение  и удаление данных для польвазтеля и для админа
-
-class AddAccountInstagramAPIView(): # Реализовать шифрование
-    pass
-
-class UpdateAccountInstgramAPIView(): # Реализовать шифрование
-    pass
-
-class DeleteAccountInstagramAPIView():
-    pass

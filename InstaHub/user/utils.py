@@ -2,6 +2,9 @@ import secrets
 import string
 import random
 
+from rest_framework import serializers
+
+
 class PasswordGeneration():
     """Класс для генерации паролей."""
 
@@ -17,6 +20,10 @@ class PasswordGeneration():
 
         return password
 
-tup = (10,20,30)
-a, *b, c = tup 
-print(b)
+
+class CurrentUserId(serializers.CurrentUserDefault):
+    """Возвращает id текущего пользователя."""
+
+    requires_context = True
+    def __call__(self, serializer_field):
+        return super().__call__(serializer_field).pk

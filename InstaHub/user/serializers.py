@@ -4,6 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from user.models import User, User_instagram_account
+from user.utils import CurrentUserId
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -95,15 +96,16 @@ class DestroyOrDeactivateSerializer(serializers.Serializer):
 
 class UserInstagramAccountSerializer(serializers.ModelSerializer):
     """
-    Серилизатор для добавления, изменения, удаления пользователем
+    Серилизатор для добавления, изменения, удаления пользователем данных авторизации
     аккаунта instagram.
      """
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    login = serializers.CharField(max_length=40, required=True,)
-    password = serializers.CharField(max_length=40, required=True)
+    user_id = serializers.HiddenField(default=CurrentUserId())
+    login_inst = serializers.CharField(max_length=40, required=True,)
+    password_inst = serializers.CharField(max_length=40, required=True)
+
     class Meta:
         model = User_instagram_account
-        fields = ('user', 'login', 'password')
+        fields = ('user_id', 'login_inst', 'password_inst')
 
 
 

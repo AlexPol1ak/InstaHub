@@ -11,7 +11,6 @@ from .views import *
 router = routers.SimpleRouter()
 router.register(r'inst-account', UserInstagramAccountViewSet, basename='inst-account')
 # print(router.urls)
-print(router.urls)
 
 
 urlpatterns = [

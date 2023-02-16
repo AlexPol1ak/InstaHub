@@ -1,19 +1,20 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from drf_spectacular.utils import extend_schema
-from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework import status, viewsets
+from rest_framework.decorators import api_view, action
 from rest_framework.generics import RetrieveAPIView, get_object_or_404, UpdateAPIView, ListAPIView, DestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from user import utils, service
-from user.models import User
+from user.models import User, User_instagram_account
 from user.paginators import GatAllUsersPagination
 from user.permissions import IsAdminOrOwnerPermission, IsOwnerPermission
 from user.serializers import UserSerializer, RetrieveUserSerializer, UserUpdateDataSerializer, \
-    UserUpdatePasswordSerializer, ResetPasswordSerializer, GetAllUserSerializer, DestroyOrDeactivateSerializer
+    UserUpdatePasswordSerializer, ResetPasswordSerializer, GetAllUserSerializer, DestroyOrDeactivateSerializer, \
+    UserInstagramAccountSerializer
 
 
 @api_view(['GET'])
@@ -177,6 +178,31 @@ class DeactivateUserAPIView(DestroyUserAPIView):
         instance.is_activ = False
         instance.save()
 
+
+
+class UserInstagramAccountViewSet(viewsets.ModelViewSet):
+    """Сохраняет, изменяет, удаляет, представляет для чтения пользовательские учетные данные для instagram"""
+
+    queryset = User_instagram_account.objects.all()
+    serializer_class = UserInstagramAccountSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, user_id=self.request.user.pk)
+        self.check_object_permissions(self.request, obj)
+        return obj
+    @action(detail=False, methods=['patch', 'put'], url_name='change', url_path='change')
+    def change_inst_data(self,request, pk=None):
+        return super().partial_update(request, pk)
+
+    @action(detail=False, methods=['delete'], url_name='delete', url_path='delete')
+    def delete_inst_data(self,request, pk=None):
+        return super().destroy(request, pk)
+
+
+
+#Доделать виев сет  на изменение  и удаление данных для польвазтеля и для админа
 
 class AddAccountInstagramAPIView(): # Реализовать шифрование
     pass

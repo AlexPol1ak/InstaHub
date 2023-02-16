@@ -1,10 +1,18 @@
 
 from django.urls import path, include
+from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 from .views import *
 
 # uvicorn InstaHub.asgi:application --reload
+
+
+router = routers.SimpleRouter()
+router.register(r'inst-account', UserInstagramAccountViewSet, basename='inst-account')
+# print(router.urls)
+print(router.urls)
+
 
 urlpatterns = [
     path('test/', test_view),
@@ -23,7 +31,6 @@ urlpatterns = [
     path('delete-user/<int:pk>/', DestroyUserAPIView.as_view(), name='delete-user'), #delete
     path('deactivate-user/<int:pk>/', DeactivateUserAPIView.as_view(), name='delete-user'), #delete
 
-
-
-
 ]
+
+urlpatterns += router.urls

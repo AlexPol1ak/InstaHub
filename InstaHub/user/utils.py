@@ -16,3 +16,7 @@ class PasswordGeneration():
         password = ''.join(raw_password)
 
         return password
+
+tup = (10,20,30)
+a, *b, c = tup 
+print(b)

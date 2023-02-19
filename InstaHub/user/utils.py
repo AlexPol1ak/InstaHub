@@ -20,7 +20,6 @@ class PasswordGeneration():
 
         return password
 
-
 class CurrentUserId(serializers.CurrentUserDefault):
     """Возвращает id текущего пользователя."""
 

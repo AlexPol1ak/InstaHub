@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+from drf_multiple_model.views import FlatMultipleModelAPIView, ObjectMultipleModelAPIView
 from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, action
@@ -11,7 +12,7 @@ from rest_framework.views import APIView
 from user import utils, service
 from user.models import User, User_instagram_account
 from user.paginators import GatAllUsersPagination
-from user.permissions import IsAdminOrOwnerPermission, IsOwnerPermission
+from user.permissions import IsAdminOrOwnerPermission, IsOwnerProfilePermission, IsOwnerInstagamPermission
 from user.serializers import UserSerializer, RetrieveUserSerializer, UserUpdateDataSerializer, \
     UserUpdatePasswordSerializer, ResetPasswordSerializer, GetAllUserSerializer, DestroyOrDeactivateSerializer, \
     UserInstagramAccountSerializer
@@ -97,27 +98,33 @@ class ResetPasswordAPIView(APIView):
         """Запрос для сброса пароля."""
 
         serializer_data = ResetPasswordSerializer(data=request.data)
+
         if serializer_data.is_valid(raise_exception=True):
             try:
                 user = User.objects.get(login=serializer_data.validated_data['login'])
-            except Exception as e:
-                return Response({'Error': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-            if user.email == serializer_data.validated_data.get('email', None):
-                try:
-                    password :str = utils.PasswordGeneration.get_random_password(10)
-
-                    user_message = service.MessagesSender(user=user)
-                    res :str = user_message.send_email_reset_password(password=password)
-                except Exception as e:
-                    return Response({'Error': e.__repr__()})
+                if user.email == serializer_data.validated_data['email']:
+                        password :str = utils.PasswordGeneration.get_random_password(10)
+                        user_message = service.MessagesSender(user=user)
+                        res :str = user_message.send_email_reset_password(password=password)
+                        user.set_password(password)
+                        user.save()
+                        return Response({'ok': 'password is reset'}, status=status.HTTP_200_OK)
                 else:
-                    user.set_password(password)
-                    user.save()
-                    return Response(res, status=status.HTTP_202_ACCEPTED)
+                    raise ValueError('Invalid email')
 
-            else:
-                return Response({'Error': 'invalid email'}, status=status.HTTP_400_BAD_REQUEST)
+            except User.DoesNotExist as e:
+                return Response({
+                                 'error': f'DoesNotExist: {str(e)}',
+                                 'message': 'User not found'
+                                 }, status=status.HTTP_404_NOT_FOUND)
+            except ValueError:
+                return Response({
+                                'Error': 'ValueError',
+                                'message': 'Invalid email'
+                                })
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
         else:
             return Response(serializer_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -135,7 +142,7 @@ class DestroySelfAPIView(DestroyAPIView):
     """Удаление аккаунта пользователем."""
     queryset = User
     serializer_class = DestroyOrDeactivateSerializer
-    pagination_class = (IsAuthenticated, IsOwnerPermission)
+    pagination_class = (IsAuthenticated, IsOwnerProfilePermission)
 
     def get_object(self):
         queryset = self.get_queryset()
@@ -185,7 +192,7 @@ class UserInstagramAccountViewSet(viewsets.ModelViewSet):
 
     queryset = User_instagram_account.objects.all()
     serializer_class = UserInstagramAccountSerializer
-    permission_classes = (IsAuthenticated,) # Доделать разрешения
+    permission_classes = (IsAuthenticated,  IsOwnerInstagamPermission)
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
@@ -203,5 +210,29 @@ class UserInstagramAccountViewSet(viewsets.ModelViewSet):
         """Удаляет пользовательские данные авторизации в instagram"""
         return super().destroy(request, pk)
 
-    # Добавить апи администратора
 
+class RetrieveSelfAllUserDataAPIView(FlatMultipleModelAPIView):
+    """
+    Возвращает все данные пользователя, а так же данные его учетной записи в instagram, если они были предоставлены.
+    """
+    permission_classes = (IsAuthenticated, IsOwnerInstagamPermission, IsOwnerProfilePermission )
+
+    # @extend_schema(responses=)
+    def get_querylist(self):
+        """
+        Динамическое формирование и объединение двух queryset:
+        Личные данные пользователя и данные о его аккаунте instagram.
+        Сериализация полученных данных.
+        """
+
+        querylist = (
+            {'queryset': User.objects.filter(id=self.request.user.pk),
+             'serializer_class':RetrieveUserSerializer,
+             'label': 'User'
+             },
+            {'queryset': User_instagram_account.objects.filter(user_id=self.request.user.pk),
+             'serializer_class': UserInstagramAccountSerializer,
+             'label': 'Instagram'
+             },
+        )
+        return querylist

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'drf_spectacular',
     'rest_framework_simplejwt',
+    'drf_multiple_model'
 ]
 
 MIDDLEWARE = [

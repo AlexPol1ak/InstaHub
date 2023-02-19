@@ -29,6 +29,7 @@ urlpatterns = [
     path('self-deactivate/', DeactivateSelfAPIView.as_view(), name='self-deactivate'), #delete
     path('delete-user/<int:pk>/', DestroyUserAPIView.as_view(), name='delete-user'), #delete
     path('deactivate-user/<int:pk>/', DeactivateUserAPIView.as_view(), name='delete-user'), #delete
+    path('all-user-data/', RetrieveSelfAllUserDataAPIView.as_view(), name='all_user_data'), #get
 
 ]
 

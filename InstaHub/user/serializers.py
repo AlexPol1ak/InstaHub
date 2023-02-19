@@ -19,12 +19,14 @@ class UserSerializer(serializers.ModelSerializer):
 
         return make_password(value)
 
+
+
 class RetrieveUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
         fields = ('id', 'login', 'email', 'first_name', 'last_name', 'phone_number', 'date_birth', 'status',
-                  'is_stuff', 'is_activ', 'date_joined')
+                  'is_stuff', 'is_activ', 'date_joined',)
 
 
 class UserUpdateDataSerializer(serializers.ModelSerializer):
@@ -79,6 +81,7 @@ class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=40, required=True, write_only=True)
     response = serializers.CharField(read_only=True)
 
+
 class GetAllUserSerializer(serializers.ModelSerializer):
     """Сериализатор для отображения всех пользователей"""
     class Meta:
@@ -94,6 +97,7 @@ class DestroyOrDeactivateSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, required=True)
 
 
+
 class UserInstagramAccountSerializer(serializers.ModelSerializer):
     """
     Серилизатор для добавления, изменения, удаления пользователем данных авторизации
@@ -106,8 +110,6 @@ class UserInstagramAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = User_instagram_account
         fields = ('user_id', 'login_inst', 'password_inst')
-
-
 
 
 

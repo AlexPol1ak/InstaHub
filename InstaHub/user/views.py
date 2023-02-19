@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from drf_multiple_model.views import FlatMultipleModelAPIView, ObjectMultipleModelAPIView
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, action
 from rest_framework.generics import RetrieveAPIView, get_object_or_404, UpdateAPIView, ListAPIView, DestroyAPIView
@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from user import utils, service
+from user import utils, service, fake_serializers
 from user.models import User, User_instagram_account
 from user.paginators import GatAllUsersPagination
 from user.permissions import IsAdminOrOwnerPermission, IsOwnerProfilePermission, IsOwnerInstagamPermission
@@ -17,7 +17,7 @@ from user.serializers import UserSerializer, RetrieveUserSerializer, UserUpdateD
     UserUpdatePasswordSerializer, ResetPasswordSerializer, GetAllUserSerializer, DestroyOrDeactivateSerializer, \
     UserInstagramAccountSerializer
 
-
+@extend_schema
 @api_view(['GET'])
 def test_view(request):
     return Response({'test': 'test page'}, status=status.HTTP_200_OK)
@@ -42,7 +42,8 @@ class CreateUserAPIView(APIView):
 
 
 class RetrieveSelfUserAPIView(RetrieveAPIView):
-    """Возвращает детальную информацию о зарегистрированном пользователе отправившим запрос"""
+    """Возвращает детальную информацию о зарегистрированном пользователе отправившим запрос."""
+
     queryset = User
     serializer_class = RetrieveUserSerializer
     permission_classes = (IsAuthenticated,)
@@ -131,13 +132,13 @@ class ResetPasswordAPIView(APIView):
 
 
 class GetAllUsersAPIView(ListAPIView):
-    """Предоставляет список все пользователей"""
+    """Предоставляет список все пользователей."""
     queryset = User.objects.all()
     serializer_class = GetAllUserSerializer
     pagination_class = GatAllUsersPagination
     permission_classes = (IsAuthenticated, IsAdminUser )
 
-
+@extend_schema_view(delete=extend_schema(request=DestroyOrDeactivateSerializer))
 class DestroySelfAPIView(DestroyAPIView):
     """Удаление аккаунта пользователем."""
     queryset = User
@@ -149,7 +150,6 @@ class DestroySelfAPIView(DestroyAPIView):
         obj = get_object_or_404(queryset, pk=self.request.user.pk)
         self.check_object_permissions(self.request, obj)
         return obj
-
     def destroy(self, request, *args, **kwargs):
 
         serializer_data = self.serializer_class(data=request.data)
@@ -174,13 +174,14 @@ class DeactivateSelfAPIView(DestroySelfAPIView):
 
 
 class DestroyUserAPIView(DestroyAPIView):
-    """Удаление аккаунта пользователя администратором"""
+    """Удаление аккаунта пользователя администратором."""
     queryset = User
     pagination_class = (IsAuthenticated, IsAdminUser)
 
 
 class DeactivateUserAPIView(DestroyUserAPIView):
-    """Деактивация аккаунта пользователя администратором"""
+    """Деактивация аккаунта пользователя администратором."""
+
     def perform_destroy(self, instance):
         instance.is_activ = False
         instance.save()
@@ -210,14 +211,14 @@ class UserInstagramAccountViewSet(viewsets.ModelViewSet):
         """Удаляет пользовательские данные авторизации в instagram"""
         return super().destroy(request, pk)
 
-
+@extend_schema(responses=fake_serializers.ResponseFakeSerializer)
 class RetrieveSelfAllUserDataAPIView(FlatMultipleModelAPIView):
     """
     Возвращает все данные пользователя, а так же данные его учетной записи в instagram, если они были предоставлены.
     """
     permission_classes = (IsAuthenticated, IsOwnerInstagamPermission, IsOwnerProfilePermission )
 
-    # @extend_schema(responses=)
+
     def get_querylist(self):
         """
         Динамическое формирование и объединение двух queryset:

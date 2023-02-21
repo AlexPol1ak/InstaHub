@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user.apps.UserConfig',
+    'parser.apps.ParserConfig',
     'APIDoc.apps.ApidocConfig',
     'rest_framework',
     'phonenumber_field',

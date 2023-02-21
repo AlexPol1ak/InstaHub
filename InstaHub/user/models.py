@@ -50,3 +50,6 @@ class User_instagram_account(models.Model):
         verbose_name = 'Instagram акаунт пользователя'
         verbose_name_plural = 'Instagram акаунты пользователя'
 
+    def __str__(self):
+        return f'{self.user}: {self.login_inst}'
+

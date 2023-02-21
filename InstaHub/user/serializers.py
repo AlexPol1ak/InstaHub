@@ -26,7 +26,7 @@ class RetrieveUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'login', 'email', 'first_name', 'last_name', 'phone_number', 'date_birth', 'status',
-                  'is_stuff', 'is_activ', 'date_joined',)
+                  'is_staff', 'is_activ', 'date_joined',)
 
 
 class UserUpdateDataSerializer(serializers.ModelSerializer):

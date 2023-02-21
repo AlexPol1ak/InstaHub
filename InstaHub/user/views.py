@@ -24,7 +24,7 @@ def test_view(request):
 
 
 class CreateUserAPIView(APIView):
-    """Регистрация нового пользвателя"""
+    """Регистрация нового пользователя."""
 
     permission_classes = (AllowAny,)
 
@@ -89,7 +89,7 @@ class ResetPasswordAPIView(APIView):
     """
     Сбрасывает пароль пользователя при предоставлении логина и email.
     Если логин и email совпадает с аккаунтом определенного пользователя, то текущий пароль сбрасывается,
-    генерируется и устанавливается случайный пароль,котрый отправляется на email.
+    генерируется и устанавливается случайный пароль, котрый отправляется на email.
     """
 
     permission_classes = (AllowAny,)
@@ -143,7 +143,7 @@ class DestroySelfAPIView(DestroyAPIView):
     """Удаление аккаунта пользователем."""
     queryset = User
     serializer_class = DestroyOrDeactivateSerializer
-    pagination_class = (IsAuthenticated, IsOwnerProfilePermission)
+    permission_classes = (IsAuthenticated, IsOwnerProfilePermission)
 
     def get_object(self):
         queryset = self.get_queryset()

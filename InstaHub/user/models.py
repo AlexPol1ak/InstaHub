@@ -16,7 +16,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_number = PhoneNumberField(null=True, unique=True, verbose_name='Номер телефона')
     date_birth = models.DateField(null=True, verbose_name='Дата рождения')
     status = models.CharField(max_length=3, default='st', verbose_name='Тарифный план')
-    is_stuff = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
     is_activ = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now, verbose_name='Дата регистрации')
 

@@ -5,7 +5,7 @@ class IsAdminOrOwnerPermission(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
 
-        if request.user.is_stuff or request.user.is_superuser or obj.id == request.user.pk:
+        if request.user.is_staff or request.user.is_superuser or obj.id == request.user.pk:
             return bool(True)
 
 class IsOwnerProfilePermission(permissions.BasePermission):

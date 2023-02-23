@@ -7,7 +7,7 @@ class InstaHub_instagram_accounts(models.Model):
 
     login_inst = models.CharField(max_length=40, unique=True, blank=False, verbose_name='Instagram логин')
     password_inst = models.CharField(max_length=40, blank=False, verbose_name='Instagram пароль')
-    email = models.EmailField(max_length=40, unique=True, blank=True,  verbose_name= 'email')
+    email = models.EmailField(max_length=40, blank=True,  verbose_name= 'email')
     email_password = models.CharField(max_length=40, blank=True, verbose_name='Пароль email')
     date_joined = models.DateTimeField(default=timezone.now, verbose_name='Дата регистрации')
     date_update = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')

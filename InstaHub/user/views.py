@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 
 from user import utils, service, fake_serializers
 from user.models import User, User_instagram_account
-from user.paginators import GatAllUsersPagination
+from user.paginators import GetAllUsersPagination
 from user.permissions import IsAdminOrOwnerPermission, IsOwnerProfilePermission, IsOwnerInstagamPermission
 from user.serializers import UserSerializer, RetrieveUserSerializer, UserUpdateDataSerializer, \
     UserUpdatePasswordSerializer, ResetPasswordSerializer, GetAllUserSerializer, DestroyOrDeactivateSerializer, \
@@ -135,7 +135,7 @@ class GetAllUsersAPIView(ListAPIView):
     """Предоставляет список все пользователей."""
     queryset = User.objects.all()
     serializer_class = GetAllUserSerializer
-    pagination_class = GatAllUsersPagination
+    pagination_class = GetAllUsersPagination
     permission_classes = (IsAuthenticated, IsAdminUser )
 
 @extend_schema_view(delete=extend_schema(request=DestroyOrDeactivateSerializer))

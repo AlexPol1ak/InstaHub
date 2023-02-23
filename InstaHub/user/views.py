@@ -176,7 +176,7 @@ class DeactivateSelfAPIView(DestroySelfAPIView):
 class DestroyUserAPIView(DestroyAPIView):
     """Удаление аккаунта пользователя администратором."""
     queryset = User
-    pagination_class = (IsAuthenticated, IsAdminUser)
+    permission_classes = (IsAuthenticated, IsAdminUser)
 
 
 class DeactivateUserAPIView(DestroyUserAPIView):

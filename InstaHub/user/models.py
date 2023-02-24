@@ -47,8 +47,8 @@ class User_instagram_account(models.Model):
     password_inst = models.CharField(max_length=40, blank=True, verbose_name='Пароль пользователя')
 
     class Meta:
-        verbose_name = 'Instagram акаунт пользователя'
-        verbose_name_plural = 'Instagram акаунты пользователя'
+        verbose_name = 'Instagram аккаунт пользователя'
+        verbose_name_plural = 'Instagram аккаунты пользователя'
 
     def __str__(self):
         return f'{self.user}: {self.login_inst}'

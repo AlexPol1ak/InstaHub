@@ -5,7 +5,7 @@ from rest_framework import routers
 
 router = routers.SimpleRouter()
 router.register(r'inst-account', ServiceInstagramAccountViewSet, basename='inst-account_service')
-print(router.urls)
+# print(router.urls)
 
 
 urlpatterns = [

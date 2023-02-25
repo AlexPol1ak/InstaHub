@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from parser.models import InstaHub_instagram_accounts
+from parser.models import InstaHubInstagramAccounts
 
 
 class ServiceInstagramAccountSerializer(serializers.ModelSerializer):
@@ -9,7 +9,7 @@ class ServiceInstagramAccountSerializer(serializers.ModelSerializer):
     аккаунта instagram.
     """
     class Meta:
-        model = InstaHub_instagram_accounts
+        model = InstaHubInstagramAccounts
         fields = ('id', 'login_inst', 'password_inst', 'email', 'email_password', 'date_update', 'date_joined', 'blocked')
         extra_kwargs = {
             'date_joined': {'read_only': True},
@@ -20,7 +20,7 @@ class ServiceInstagramAccountBlockedSerializer(serializers.ModelSerializer):
     """Сериализатор для установки флага блокировки/разблокирвоки на аккаунт instagram."""
 
     class Meta:
-        model = InstaHub_instagram_accounts
+        model = InstaHubInstagramAccounts
         fields = ('id', 'blocked', 'date_update')
         extra_kwargs = {
             'id': {'read_only': True},

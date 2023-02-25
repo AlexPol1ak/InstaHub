@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
-from parser.models import InstaHub_instagram_accounts
+from parser.models import InstaHubInstagramAccounts
 from parser.paginators import InstagramAccountsPagination
 from parser.serializers import ServiceInstagramAccountSerializer, ServiceInstagramAccountBlockedSerializer
 
@@ -20,7 +20,7 @@ class ServiceInstagramAccountViewSet(viewsets.ModelViewSet):
     аккаунтов сервиса.
     """
 
-    queryset = InstaHub_instagram_accounts.objects.all()
+    queryset = InstaHubInstagramAccounts.objects.all()
     serializer_class = ServiceInstagramAccountSerializer
     permission_classes = (IsAuthenticated, IsAdminUser)
     pagination_class = InstagramAccountsPagination

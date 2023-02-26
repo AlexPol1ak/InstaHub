@@ -64,4 +64,7 @@ class ScreenshotProfile(models.Model):
         verbose_name = 'Состояние профиля instagram'
         verbose_name_plural = 'Состояния профилей instagram'
 
+    def __str__(self):
+        return f'{self.pk}. {self.name}. date_joined:{str(self.date_joined)}'
+
 

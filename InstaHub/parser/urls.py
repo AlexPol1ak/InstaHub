@@ -10,6 +10,7 @@ router.register(r'inst-account', ServiceInstagramAccountViewSet, basename='inst-
 
 urlpatterns = [
     path('test-parser/', test_view_parser),
+    path('add-tracked-user/', AddTrackedUserAPIView.as_view(), name='add_tracked_user')
     ]
 
 urlpatterns += router.urls

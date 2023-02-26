@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from parser.models import InstaHubInstagramAccounts
+from parser.models import InstaHubInstagramAccounts, TrackedUsers
 
 
 class ServiceInstagramAccountSerializer(serializers.ModelSerializer):
@@ -27,3 +27,14 @@ class ServiceInstagramAccountBlockedSerializer(serializers.ModelSerializer):
             'blocked': {'required': True},
             'date_update': {'read_only': True},
                         }
+
+
+class AddTrackedUserSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для добавления пользователя instagram в список отслеживаемых или получения списка всех отслеживаемых
+    """
+
+    class Meta:
+        model = TrackedUsers
+        fields = ('id','user', 'user_name', 'profile_link', 'id_instagram')
+        read_only_fields = ('id', 'user', 'profile_link', 'id_instagram')

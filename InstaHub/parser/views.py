@@ -1,11 +1,15 @@
+from django.db import IntegrityError
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, action
+from rest_framework.generics import ListCreateAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from parser.models import InstaHubInstagramAccounts
+from parser.models import InstaHubInstagramAccounts, TrackedUsers
 from parser.paginators import InstagramAccountsPagination
-from parser.serializers import ServiceInstagramAccountSerializer, ServiceInstagramAccountBlockedSerializer
+from parser.serializers import ServiceInstagramAccountSerializer, ServiceInstagramAccountBlockedSerializer, \
+     AddTrackedUserSerializer
 
 
 @api_view(['GET'])
@@ -47,4 +51,47 @@ class ServiceInstagramAccountViewSet(viewsets.ModelViewSet):
         return Response(response_data.data, status=status.HTTP_200_OK)
 
 
+class AddTrackedUserAPIView(CreateAPIView):
+    """
+    Добавляет пользователя instagram в список отслеживаемых или получения списка всех отслеживаемых
+    """
 
+    queryset = TrackedUsers.objects.all()
+    serializer_class = AddTrackedUserSerializer
+    permission_classes = (IsAuthenticated,)
+    pagination_class = None
+
+    def post(self, request, *args, **kwargs):
+        """Добавляет пользователя instagram  в список отслеживаемых."""
+
+        fake_user = self._get_user_instagram()
+
+        data = self.serializer_class(data=request.data)
+        if data.is_valid(raise_exception=True):
+            try:
+                obj = TrackedUsers(id_instagram= fake_user.id,
+                                    user_name=data.validated_data['user_name'],
+                                    profile_link=fake_user.profile_link,
+                                    )
+                obj.save()
+                obj.user.add(request.user)
+                response_data = self.serializer_class(obj).data
+            except TypeError as e:
+                return Response({
+                    'Error': 'Communication setup error',
+                    'detail': str(e)
+                                 })
+            except IntegrityError as e:
+                obj = TrackedUsers.objects.get(id_instagram=2487)
+                obj.user.add(request.user)
+                response_data = self.serializer_class(obj).data
+
+        return Response(response_data)
+
+    def _get_user_instagram(self, user_name: str= ''):
+        """Получает данные пользователя instagram."""
+
+        # Временный фальшивый пользователь, заменить позже на парсинг реального
+        from parser.utils.fake_data_creation import CreateFakeInstagramProfiles
+        user = CreateFakeInstagramProfiles(language='ru', gender='male')
+        return user

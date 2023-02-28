@@ -6,10 +6,12 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from parser.instagram_parser.inst_parser import InstagramParser
 from parser.models import InstaHubInstagramAccounts, TrackedUsers
 from parser.paginators import InstagramAccountsPagination
 from parser.serializers import ServiceInstagramAccountSerializer, ServiceInstagramAccountBlockedSerializer, \
-     AddTrackedUserSerializer
+    AddTrackedUserSerializer
+from user.models import User_instagram_account
 
 
 @api_view(['GET'])
@@ -62,36 +64,64 @@ class AddTrackedUserAPIView(CreateAPIView):
     pagination_class = None
 
     def post(self, request, *args, **kwargs):
-        """Добавляет пользователя instagram  в список отслеживаемых."""
+        """Добавляет пользователя instagram в список отслеживаемых."""
+        pass
 
-        fake_user = self._get_user_instagram()
 
-        data = self.serializer_class(data=request.data)
-        if data.is_valid(raise_exception=True):
-            try:
-                obj = TrackedUsers(id_instagram= fake_user.id,
-                                    user_name=data.validated_data['user_name'],
-                                    profile_link=fake_user.profile_link,
-                                    )
-                obj.save()
-                obj.user.add(request.user)
-                response_data = self.serializer_class(obj).data
-            except TypeError as e:
-                return Response({
-                    'Error': 'Communication setup error',
-                    'detail': str(e)
-                                 })
-            except IntegrityError as e:
-                obj = TrackedUsers.objects.get(id_instagram=2487)
-                obj.user.add(request.user)
-                response_data = self.serializer_class(obj).data
+class DeleteTrackedUserAPIView():
+    """Удаляет пользователя instagram из списка отслеживаемых."""
+    pass
 
-        return Response(response_data)
 
-    def _get_user_instagram(self, user_name: str= ''):
-        """Получает данные пользователя instagram."""
+class MyListTrackedUsersAPIView():
+    """Возвращает список отслеживаемых."""
+    pass
 
-        # Временный фальшивый пользователь, заменить позже на парсинг реального
-        from parser.utils.fake_data_creation import CreateFakeInstagramProfiles
-        user = CreateFakeInstagramProfiles(language='ru', gender='male')
-        return user
+
+class NewFollowersAndUnfollowersAPIView():
+    """
+    Возвращает список новых подписчиков и тех кто отписался отслеживаемого пользователя instagram.
+    """
+    pass
+
+
+class NewFollowingAndUnFollowingAPIView():
+    """
+    Возвращает список новых подписок и отписок отслеживаемого пользователя instagram.
+    """
+    pass
+
+
+class SharedFollowersAPIView():
+    """Возвращает список общих подписчиков между двумя пользователями Instagram."""
+    pass
+
+
+class SharedFollowingAPIView():
+    """Возвращает список общих подписок между двумя пользователями."""
+    pass
+
+
+class SharedFollowersAndFollowingAPIView():
+    """
+    Возвращает список общих подписок и подписчиков между двумя пользователями instagram.
+    """
+    pass
+
+
+class DownloadPhotoAPIView():
+    """Возвращает фото из публикации."""
+    pass
+
+
+class DownloadVideoAPIView():
+    """Возвращает видео Reels из публикации."""
+    pass
+
+class LikedPublicationsAPIView():
+    """Возвращает количество лайков и список лайкнувших публикацию"""
+    pass
+
+class CommentPublicationsAPIView():
+    """Возвращает количество коменатриев к публикации и комментаторов."""
+    pass

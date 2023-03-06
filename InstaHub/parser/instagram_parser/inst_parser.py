@@ -1,10 +1,7 @@
-import random
 import time
-
 from instagrapi import Client
 
-from parser.models import InstaHubInstagramAccounts
-from user.models import User, User_instagram_account
+
 
 
 class _InstConnect():
@@ -25,11 +22,7 @@ class _InstConnect():
 
     def connect_inst(self, pk: int):
         """Соединение с Instagram."""
-        if not self.inst_connecting:
-            if self._install_inst_auth_data(pk=pk):
-                self.client.login(self.login, self.__password)
-
-                self.inst_connecting = True
+        #add code
         return self.client
 
     def disconnect_inst(self):
@@ -39,46 +32,7 @@ class _InstConnect():
             self.inst_connecting = False
         return self.inst_connecting
 
-    def _install_inst_auth_data(self, pk):
-        """Установка данных авторизации для подключения к instagram."""
-        if self._install_user_inst_auth_data(pk):
-            return True
-        elif self._install_service_inst_auth_data(pk):
-            return True
 
-    def _install_user_inst_auth_data(self, pk: int):
-        """Получает логин и пароль для instagram от пользователя."""
-
-        try:
-            # Получаем логин и пароль от instagram от пользователя, если пользователь их указал.
-            # Устанавливаем в качестве данных для подключения к instagram
-            user_inst = User_instagram_account.get(user_id=pk)
-            self.login = user_inst.login_inst
-            self.__password = user_inst.password_inst
-            # Возвращаем флаг для подключения
-            return True
-        # Если пользователь не сохранил логин или пароль-вернуть False в функцию подключения.
-        except User_instagram_account.DoesNotExist:
-            raise FileNotFoundError('Пользователь не указал данные от instagram')
-
-    def _install_service_inst_auth_data(self, pk):
-        """
-        Получает случайный логин и пароль для instagram из БД принадлежащих сервису InstaHub.
-        """
-        # Если статус пользователя выше чем стандарт
-        if User.objects.get(pk=pk).status == 'st':
-            raise PermissionError('Недостаточный статус для использования аккаунтов сервиса InstaHub')
-
-        else:
-            users = InstaHubInstagramAccounts.objects.filter(blocked=False)
-            if len(users) == 0:
-                raise FileNotFoundError('Отсутствуют не заблокированные аккаунты')
-
-            user_inst = random.choice(users)
-            self.login = user_inst.login_inst
-            self.__password = user_inst.password_inst
-
-        return True
 
 class _ActionsCounter(_InstConnect):
     """Счетчик действий."""
@@ -148,16 +102,18 @@ class _GetFollowing():
 
 
 class _InstagramActionsMixin(_ActionsCounter, _GetUserInfo, _GetFollowers, _GetFollowing):
-    """Аккумулируeт все действия с профилем instagram."""
+    """Аккумулирует все действия с профилем instagram."""
     def __init__(self):
         """Инициализация функционала внутреннего счетчика действий и функционала подключения к isntagram."""
         super().__init__() # <-_ActionsCounter , + _InstConnect
 
 class InstagramParser(_InstagramActionsMixin):
     """Instagram parser."""
-    def __init__(self):
+    def __init__(self, **kwargs):
         """Инициализация функционала действий парсера """
         super().__init__()
+        self.kwargs = kwargs
+
 
     def __str__(self):
         return f'Object  {self.__class__}. Connecting {self.login}'

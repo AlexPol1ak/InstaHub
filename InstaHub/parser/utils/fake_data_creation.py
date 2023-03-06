@@ -1,10 +1,9 @@
 from random import random, randint
-
 from django.utils import timezone
 from mimesis import Person, Text
 from mimesis.enums import Gender
 
-
+# Для проверки  моделей и API
 class FakeInstagramProfile():
     """Класс представляет фальшивый профиль instagram"""
 

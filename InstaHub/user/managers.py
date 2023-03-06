@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.db import transaction
 
+
 class UserManager(BaseUserManager):
     """Менеджер для создания пользователей."""
 

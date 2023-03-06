@@ -4,10 +4,11 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.db import models
 from django.utils import timezone
 
+from parser.instagram_parser import InstagramParser
 from user.managers import UserManager
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """Модель для личных данных пользователя."""
+    """Модель личных данных пользователя."""
 
     login = models.CharField(max_length=40, unique=True, verbose_name='Логин')
     first_name = models.CharField(max_length=40, blank=True, verbose_name='Имя')
@@ -37,6 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         user = f"Login: {self.login}. email: {self.email}"
         return user
 
+    parser = InstagramParser()
 
 
 

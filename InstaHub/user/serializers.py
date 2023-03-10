@@ -109,7 +109,7 @@ class UserInstagramAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User_instagram_account
-        fields = ('user_id', 'login_inst', 'password_inst')
+        fields = ('user_id', 'login_inst', 'password_inst', 'verification_code')
 
 
 

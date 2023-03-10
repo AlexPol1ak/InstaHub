@@ -47,6 +47,7 @@ class User_instagram_account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, parent_link=True)
     login_inst = models.CharField(max_length=40, unique=True, blank=True, verbose_name='Instagram пользователя')
     password_inst = models.CharField(max_length=40, blank=True, verbose_name='Пароль пользователя')
+    verification_code = models.CharField(max_length=40, blank=True, verbose_name='Код верификации')
 
     class Meta:
         verbose_name = 'Instagram аккаунт пользователя'

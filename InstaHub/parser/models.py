@@ -11,6 +11,7 @@ class InstaHubInstagramAccounts(models.Model):
 
     login_inst = models.CharField(max_length=40, unique=True, blank=False, verbose_name='Instagram логин')
     password_inst = models.CharField(max_length=40, blank=False, verbose_name='Instagram пароль')
+    verification_code = models.CharField(max_length=40, blank=True, verbose_name='Код верификации')
     email = models.EmailField(max_length=40, blank=True, verbose_name='email')
     email_password = models.CharField(max_length=40, blank=True, verbose_name='Пароль email')
     date_joined = models.DateTimeField(default=timezone.now, verbose_name='Дата регистрации')

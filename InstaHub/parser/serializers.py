@@ -10,7 +10,8 @@ class ServiceInstagramAccountSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = InstaHubInstagramAccounts
-        fields = ('id', 'login_inst', 'password_inst', 'email', 'email_password', 'date_update', 'date_joined', 'blocked')
+        fields = ('id', 'login_inst', 'password_inst','verification_code',
+                  'email', 'email_password', 'date_update', 'date_joined', 'blocked', )
         extra_kwargs = {
             'date_joined': {'read_only': True},
             'blocked': {'read_only': True},

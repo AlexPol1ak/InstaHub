@@ -85,7 +85,6 @@ class _GetFollowers():
 
     def get_followers(self, inst_user: str | int):
         """Получает id по user_name, получает всех подписчиков"""
-        # self.add_counter_action()
 
         time.sleep(2)
         if isinstance(inst_user, str):
@@ -103,7 +102,6 @@ class _GetFollowing():
 
     def get_following(self, inst_user: str | int):
         """Получает id по user_name, получает всех подписчиков"""
-        # self.add_counter_action()
 
         time.sleep(2)
         if isinstance(inst_user, str):

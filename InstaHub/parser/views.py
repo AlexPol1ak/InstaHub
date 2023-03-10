@@ -11,7 +11,8 @@ from parser.models import InstaHubInstagramAccounts, TrackedUsers
 from parser.paginators import InstagramAccountsPagination
 from parser.serializers import ServiceInstagramAccountSerializer, ServiceInstagramAccountBlockedSerializer, \
     AddTrackedUserSerializer
-from user.models import User_instagram_account
+import utils
+from parser.utils import inst_accounts
 
 
 @api_view(['GET'])
@@ -65,7 +66,19 @@ class AddTrackedUserAPIView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         """Добавляет пользователя instagram в список отслеживаемых."""
+
+        serializer_data = self.serializer_class(data=request.data)
+        if serializer_data.is_valid(raise_exception=True):
+            pass
+
+    def _get_info_user_inst(self, username):
+        """Получает информацию пользвателе instagram"""
         pass
+
+    def _connect_instagram(self):
+        """Подключается к instagram."""
+        user_auth_inst = inst_accounts.get_inst_auth_data(user=self.request.user)
+        self.request.user.parser # Устновить данные пользователя
 
 
 class DeleteTrackedUserAPIView():

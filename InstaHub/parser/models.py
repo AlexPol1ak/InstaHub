@@ -59,7 +59,8 @@ class ScreenshotProfile(models.Model):
     followers = models.JSONField(verbose_name='Подписчики')
     following = models.JSONField(verbose_name='Подписки')
     date_joined = models.DateTimeField(default=timezone.now, verbose_name='Дата фиксации состояния ')
-    tracked_users = models.ForeignKey(TrackedUsers, on_delete=models.DO_NOTHING)
+    tracked_users = models.ForeignKey(UserTrackedUsersRelations, on_delete=models.DO_NOTHING)
+
 
     class Meta:
         verbose_name = 'Состояние профиля instagram'

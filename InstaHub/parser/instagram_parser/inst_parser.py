@@ -18,7 +18,7 @@ class _InstConnect():
         # предоставляет API для парсинга instagram
         self.client = Client()
 
-    def connect_inst(self, pk: int):
+    def connect_inst(self):
         """Соединение с Instagram."""
 
         if not self.login and not self.__password:
@@ -38,6 +38,10 @@ class _InstConnect():
             self.client.logout()
             self.inst_connecting = False
         return self.inst_connecting
+
+    def install_auth_data(self, login, password, verefication_code):
+        """Установить данные для входа в instagram"""
+        pass
 
 
 class _ActionsCounter(_InstConnect):
